@@ -7,14 +7,6 @@ out/
 _dist/
 _output/
 
-# Dependencies
-node_modules/
-packages/
-
-# Logs and temp files
-*.log
-*.tmp
-*.temp
 
 # Environment
 .env
@@ -24,31 +16,5 @@ packages/
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
+.vs/
 
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-*.so
-.Python
-*.egg-info/
-.eggs/
-```
