@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/deploy.yaml" />
     <File Path=".gitignore" />
   </Folder>
   <Folder Name="/src/">
