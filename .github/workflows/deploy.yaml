@@ -1,0 +1,32 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_FOLDER: src
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: 🌿 Branch info
+        run: echo "Branch: ${{ github.ref }}"
+
+      - name: 📦 Checkout code
+        uses: actions/checkout@v5
+
+      - name: ⚙️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: 🔄 Restore packages
+        run: dotnet restore ${{ env.PROJECT_FOLDER }}
+
+      - name: 🏗️ Build
+        run: dotnet build -c Release --no-restore
