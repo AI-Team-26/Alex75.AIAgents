@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: 🌿 Branch info
-        run: echo "Branch: ${{ github.ref }}"
+        run: 'echo "Branch: ${{ github.ref }}"'
 
       - name: 📦 Checkout code
         uses: actions/checkout@v5
