@@ -1,7 +1,6 @@
 ```
 # Build artifacts
 *.sln
-*.fsproj
 bin/
 obj/
 out/
