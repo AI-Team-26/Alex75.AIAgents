@@ -55,7 +55,7 @@ let selection = AnsiConsole.Prompt(
                 TextPrompt<string>("[bold]Enter directory path:[/]")
                     .DefaultValue("d:/music")
             )
-            listSongs path
+            listSongs path |> ignore
 
         | "Create a catalogue of songs in a directory" ->
             AnsiConsole.MarkupLine("[yellow]Catalogue (not yet implemented)[/]")

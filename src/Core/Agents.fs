@@ -4,7 +4,6 @@ open System
 open System.Threading.Tasks
 open Microsoft.Agents.AI
 open Microsoft.Extensions.AI
-open Microsoft.Agents.AI.OpenAI
 open OllamaSharp
 
 // ============================================================================
@@ -61,21 +60,32 @@ type AgentDefinition = {
 
 type AgentFactory(llmService: LLMService, model: string) =
 
+    let create (settings: AgentDefinition, chatClient: IChatClient) : AIAgent = 
+        let chatClientBuilder = chatClient.AsBuilder()
+        let chatClient = chatClientBuilder.Build()
+
+        let agentBuilder =
+            chatClient.AsAIAgent(settings.Instructions, settings.Name, settings.Description)
+                .AsBuilder()
+
+        agentBuilder.Build()
+
     let createAgent (definition: AgentDefinition) =
         match llmService with 
         | LocalOllama ollama -> 
-            let config = OllamaApiClient.Configuration()
-            config.Uri <- Uri ollama.URL
-            config.Model <- model
-            let client = new OllamaApiClient(config)
-            client.AsAIAgent(definition.Instructions, definition.Name, definition.Description)
+            // Ollama provides OpenAI-compatible API at /v1 endpoint
+            let credentials = ClientModel.ApiKeyCredential "ollama"
+            let options = OpenAI.OpenAIClientOptions()
+            options.Endpoint <- Uri ollama.URL
+            let chatClient = OpenAI.Chat.ChatClient(model, credentials, options).AsIChatClient()
+            create(definition, chatClient)
 
         | OpenAICompatible openai ->
             let credentials = ClientModel.ApiKeyCredential openai.ApiKey
-            let options = OpenAIClientOptions()
+            let options = OpenAI.OpenAIClientOptions()
             options.Endpoint <- Uri openai.URL
-            OpenAIChatClient(model, credentials, options)
-                .AsAIAgent(definition.Instructions, definition.Name, definition.Description)
+            let chatClient = OpenAI.Chat.ChatClient(model, credentials, options).AsIChatClient()
+            create(definition, chatClient)
             
         | KnownProvider knownProvider ->
             let url = 
@@ -90,16 +100,16 @@ type AgentFactory(llmService: LLMService, model: string) =
                 | LLMProvider.Google -> Constants.LLMProviders.GOOGLE_URL
 
             let credentials = ClientModel.ApiKeyCredential knownProvider.ApiKey
-            let options = OpenAIClientOptions()
+            let options = OpenAI.OpenAIClientOptions()
             options.Endpoint <- Uri url
-            OpenAIChatClient(model, credentials, options)
-                .AsAIAgent(definition.Instructions, definition.Name, definition.Description)
+            let chatClient = OpenAI.Chat.ChatClient(model, credentials, options).AsIChatClient()
+            create(definition, chatClient)
 
-    member this.CreateOrchestrator(definition: AgentDefinition) : Task<AIAgent> = task {
-        let agent = createAgent definition
-        let! session = agent.CreateSessionAsync()
-        return session.Agent
-    }
+    member this.CreateOrchestrator(definition: AgentDefinition) : Task<AIAgent> = 
+        task {
+            let agent = createAgent definition
+            return agent
+        }
 
     member this.CreateOrchestrator(name: string, description: string, instructions: string) =
         let definition = { Name = name; Description = description; Instructions = instructions }
