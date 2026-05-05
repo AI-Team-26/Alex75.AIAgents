@@ -9,6 +9,12 @@ A .NET F# library for creating AI agents with tools - simple functions over fram
 
 ---
 
+## In Progress
+
+- [ ] (nothing currently)
+
+---
+
 ## Backlog
 
 ### Core Types & Interfaces
@@ -56,12 +62,6 @@ A .NET F# library for creating AI agents with tools - simple functions over fram
 - [ ] Add usage examples to `/src/Core/README.md`
 - [ ] Set up unit test project
 - [ ] Add integration tests (requires LLM API key)
-
----
-
-## In Progress
-
-- [ ] (nothing currently)
 
 ---
 

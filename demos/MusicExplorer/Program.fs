@@ -2,7 +2,7 @@ open System
 open Spectre.Console
 
 // ============================================================================
-// MusicExplorer Demo - Alex75.AIAgents.Core
+// MusicExplorer Demo
 // ============================================================================
 // This demo shows how to use the library to:
 // 1. Scan a music directory for FLAC/MP3 files
@@ -14,8 +14,8 @@ open Spectre.Console
 [<EntryPoint>]
 let main argv =
     // Display header
-    AnsiConsole.MarkupLine("[bold cyan]MusicExplorer Demo - Alex75.AIAgents.Core[/]")
-    AnsiConsole.MarkupLine("[dim]==========================================[/]\n")
+    AnsiConsole.MarkupLine("[bold cyan]MusicExplorer Demo[/]")
+    AnsiConsole.MarkupLine("[dim]====================[/]\n")
     
     // Get user request from command line or prompt
     let request = 
