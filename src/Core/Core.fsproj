@@ -7,10 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+<<<<<<< add/nuget_package_icon
     <None Include="icon.svg" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
+=======
+    <None Include="README.md" />
+>>>>>>> main
     <Compile Include="Library.fs" />
   </ItemGroup>
+
+  <ItemGroup />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Agents.AI" />
