@@ -11,44 +11,63 @@ open Spectre.Console
 // ============================================================================
 
 /// List songs in a directory (placeholder)
-let listSongs (directory: string) =
+let listSongs (directory: string) = task {
     // TODO: Implement with fileExplorerAgent
-    AnsiConsole.MarkupLine $"[yellow]List songs in {directory} (not yet implemented)[/]"
 
-[<EntryPoint>]
-let main argv =
-    // Display header
-    AnsiConsole.MarkupLine("[bold cyan]MusicLibrary Demo[/]")
-    AnsiConsole.MarkupLine("[dim]====================[/]\n")
+    let question = $"List songs in {directory}"
 
-    // Main menu selector
-    let choices = [
-        "Show me what songs are in a directory"
-        "Create a catalogue of songs in a directory"
-        "Convert FLAC files to MP3"
-    ]
+    AnsiConsole.MarkupLine $"[yellow]{question}[/]"
 
-    let selection = AnsiConsole.Prompt(
-        SelectionPrompt<string>()
-            .Title("[bold]What would you like to do?[/]")
-            .AddChoices(choices)
-    )
+    let! agent = Helper.CreateAgent()
+    // Add FileSystemAgent(drectory)
 
-    match selection with
-    | "Show me what songs are in a directory" ->
-        let path = AnsiConsole.Prompt(
-            TextPrompt<string>("[bold]Enter directory path:[/]")
-                .DefaultValue("d:/music")
-        )
-        listSongs path
+    let! response = agent.RunAsync(question)
 
-    | "Create a catalogue of songs in a directory" ->
-        AnsiConsole.MarkupLine("[yellow]Catalogue (not yet implemented)[/]")
+    let answer = response.Text
 
-    | "Convert FLAC files to MP3" ->
-        AnsiConsole.MarkupLine("[yellow]Convert FLAC to MP3 (not yet implemented)[/]")
+    AnsiConsole.MarkupLine $"[cyan]{answer}[/]"
+}
 
-    | _ ->
-        AnsiConsole.MarkupLine("[red]Unknown option[/]")
 
-    0  // Exit code
+// Display header
+AnsiConsole.MarkupLine("[bold cyan]MusicLibrary Demo[/]")
+AnsiConsole.MarkupLine("[dim]====================[/]\n")
+
+// Main menu selector
+let choices = [
+    "Show me what songs are in a directory"
+    "Create a catalogue of songs in a directory"
+    "Convert FLAC files to MP3"
+]
+
+let selection = AnsiConsole.Prompt(
+    SelectionPrompt<string>()
+        .Title("[bold]What would you like to do?[/]")
+        .AddChoices(choices)
+)
+    
+(task {
+
+    try
+        match selection with
+        | "Show me what songs are in a directory" ->
+            let path = AnsiConsole.Prompt(
+                TextPrompt<string>("[bold]Enter directory path:[/]")
+                    .DefaultValue("d:/music")
+            )
+            listSongs path
+
+        | "Create a catalogue of songs in a directory" ->
+            AnsiConsole.MarkupLine("[yellow]Catalogue (not yet implemented)[/]")
+
+        | "Convert FLAC files to MP3" ->
+            AnsiConsole.MarkupLine("[yellow]Convert FLAC to MP3 (not yet implemented)[/]")
+
+        | _ ->
+            AnsiConsole.MarkupLine("[red]Unknown option[/]")
+    with ex ->
+       AnsiConsole.MarkupLine $"[red]Failed to call Agent.[/]"
+       AnsiConsole.WriteException(ex)
+
+})//.Spinner(Spinner.Known.Aesthetic)
+|> Async.AwaitTask |> Async.RunSynchronously
