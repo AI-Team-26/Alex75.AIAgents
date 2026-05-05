@@ -4,8 +4,8 @@
     <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
-    <File Path="src/README.md" />
-    <File Path="src/TODO.md" />
+    <File Path="README.md" />
+    <File Path="TODO.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Core/Core.fsproj" />
