@@ -16,16 +16,12 @@ let listSongs (directory: string) = task {
 
     let question = $"List songs in {directory}"
 
-    AnsiConsole.MarkupLine $"[yellow]{question}[/]"
-
     let! agent = Helper.CreateAgent()
-    // Add FileSystemAgent(drectory)
+    // Add FileSystemAgent(directory)
 
     let! response = agent.RunAsync(question)
 
-    let answer = response.Text
-
-    AnsiConsole.MarkupLine $"[cyan]{answer}[/]"
+    return response.Text
 }
 
 /// Main menu choices
@@ -53,13 +49,38 @@ let handleSelection selection = task {
                 TextPrompt<string>("[bold]Enter directory path:[/]")
                     .DefaultValue("d:/music")
             )
-            do! listSongs path
+
+            let! answer =
+                AnsiConsole
+                    .Status()
+                    .Spinner(Spinner.Known.Dots)
+                    .SpinnerStyle(Style.Parse("cyan"))
+                    .StartAsync($"[bold]Scanning {path}...[/]", fun _ ->
+                        listSongs path)
+
+            AnsiConsole.MarkupLine $"[cyan]{answer}[/]"
 
         | "Create a catalogue of songs in a directory" ->
-            AnsiConsole.MarkupLine("[yellow]Catalogue (not yet implemented)[/]")
+            AnsiConsole
+                .Status()
+                .Spinner(Spinner.Known.Dots)
+                .StartAsync("Creating catalogue...", fun _ ->
+                    task {
+                        do! System.Threading.Tasks.Task.Delay 1000
+                        AnsiConsole.MarkupLine("[yellow]Catalogue (not yet implemented)[/]")
+                    })
+            |> ignore
 
         | "Convert FLAC files to MP3" ->
-            AnsiConsole.MarkupLine("[yellow]Convert FLAC to MP3 (not yet implemented)[/]")
+            AnsiConsole
+                .Status()
+                .Spinner(Spinner.Known.Dots)
+                .StartAsync("Converting FLAC to MP3...", fun _ ->
+                    task {
+                        do! System.Threading.Tasks.Task.Delay 1000
+                        AnsiConsole.MarkupLine("[yellow]Convert FLAC to MP3 (not yet implemented)[/]")
+                    })
+            |> ignore
 
         | "Exit" ->
             AnsiConsole.MarkupLine("[green]Goodbye![/]")
