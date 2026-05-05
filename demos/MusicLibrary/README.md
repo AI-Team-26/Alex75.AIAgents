@@ -10,7 +10,7 @@ MusicLibrary is a **mock-only** demo application that showcases the agent orches
 
 ```bash
 cd demos/MusicLibrary
-dotnet run -- "What MP3 files are in /music"
+dotnet run -- "What MP3 files are in /d//music ?"
 ```
 
 ## Demo Scenarios

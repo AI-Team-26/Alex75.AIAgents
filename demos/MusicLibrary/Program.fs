@@ -16,34 +16,18 @@ let main argv =
     AnsiConsole.MarkupLine("[bold cyan]MusicLibrary Demo[/]")
     AnsiConsole.MarkupLine("[dim]====================[/]\n")
 
-    // Get user request from command line or prompt
-    let request =
-        if argv.Length > 0 then
-            String.Join(" ", argv)
-        else
-            AnsiConsole.Prompt(
-                TextPrompt<string>("[bold]What would you like to do?[/]")
-                    .DefaultValue("What MP3 files are in d:/music")
-            )
 
-    AnsiConsole.MarkupLine(sprintf "\n[bold]Request:[/] %s\n" request)
+    // TODO:
 
-    // Display a sample table (placeholder for future implementation)
-    let table = Table()
-    table.AddColumn("[bold]Artist[/]") |> ignore
-    table.AddColumn("[bold]Album[/]") |> ignore
-    table.AddColumn("[bold]Year[/]") |> ignore
-    table.AddColumn("[bold]Format[/]") |> ignore
-    table.AddColumn("[bold]Files[/]") |> ignore
+    // Give the user a selection of choices:
+    // 1. Show me whast songs are in a directory
+    // 2. Create a catalog of the songs in a directory
+    // 3. Convert FLAC files in a directory to MP3 files
 
-    table.AddRow("Pink Floyd", "The Dark Side of the Moon", "1973", "MP3", "9") |> ignore
-    table.AddRow("Pink Floyd", "The Wall", "1979", "MP3", "26") |> ignore
-    table.AddRow("Led Zeppelin", "IV", "1971", "MP3", "8") |> ignore
-    table.AddRow("Ange de Poitrine", "Métamorphose", "2024", "FLAC", "12") |> ignore
 
-    AnsiConsole.Write(table)
+    // if selection is 1. ask the user to provide a path to a directory.
+    // then execute "List songs" fulction
 
-    AnsiConsole.MarkupLine("\n[yellow]⚠️  Library not yet implemented.[/]")
-    AnsiConsole.MarkupLine("[dim]See TODO.md for implementation status.[/]")
+
 
     0  // Exit code
