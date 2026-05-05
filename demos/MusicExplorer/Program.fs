@@ -1,4 +1,5 @@
 open System
+open Spectre.Console
 
 // ============================================================================
 // MusicExplorer Demo - Alex75.AIAgents.Core
@@ -12,50 +13,38 @@ open System
 
 [<EntryPoint>]
 let main argv =
-    printfn "MusicExplorer Demo - Alex75.AIAgents.Core"
-    printfn "==========================================\n"
+    // Display header
+    AnsiConsole.MarkupLine("[bold cyan]MusicExplorer Demo - Alex75.AIAgents.Core[/]")
+    AnsiConsole.MarkupLine("[dim]==========================================[/]\n")
     
     // Get user request from command line or prompt
     let request = 
         if argv.Length > 0 then 
             String.Join(" ", argv)
         else
-            printf "What would you like to do? "
-            Console.ReadLine()
+            AnsiConsole.Prompt(
+                TextPrompt<string>("[bold]What would you like to do?[/]")
+                    .DefaultValue("Show me my music collection")
+            )
     
-    printfn "\nRequest: %s\n" request
+    AnsiConsole.MarkupLine(sprintf "\n[bold]Request:[/] %s\n" request)
     
-    // ========================================================================
-    // TODO: Implement actual library usage
-    // ========================================================================
-    // Expected flow:
-    // 
-    // 1. Create context provider (shared memory for agents)
-    //    let context = ContextProvider.CreateInMemory()
-    //
-    // 2. Create LLM config
-    //    let llmConfig = { Provider = "OpenAI"; Model = "gpt-4"; ApiKey = "..." }
-    //
-    // 3. Create agents with context
-    //    let fileExplorer = Agents.fileExplorerAgent(llmConfig, "d:/music", context)
-    //    let fileEditor = Agents.fileEditorAgent(llmConfig, "d:/output", context)
-    //    
-    // 4. Create custom FLAC→MP3 tool
-    //    let flacToMp3Tool = Tools.create "Convert FLAC to MP3" convertFlacToMp3
-    //    let converterAgent = Agents.createAgentWithTools(llmConfig, "Converter", context, [flacToMp3Tool])
-    //
-    // 5. Create orchestrator and add agents
-    //    let orchestrator = AgentOrchestrator(llmConfig, context)
-    //        .AddAgent(fileExplorer)
-    //        .AddAgent(fileEditor)
-    //        .AddAgent(converterAgent)
-    //
-    // 6. Execute request
-    //    let! result = orchestrator.Ask(request)
-    //    printfn "%s" result
-    // ========================================================================
+    // Display a sample table (placeholder for future implementation)
+    let table = Table()
+    table.AddColumn("[bold]Artist[/]") |> ignore
+    table.AddColumn("[bold]Album[/]") |> ignore
+    table.AddColumn("[bold]Year[/]") |> ignore
+    table.AddColumn("[bold]Format[/]") |> ignore
+    table.AddColumn("[bold]Files[/]") |> ignore
     
-    printfn "Library not yet implemented."
-    printfn "See TODO.md for implementation status."
+    table.AddRow("Pink Floyd", "The Dark Side of the Moon", "1973", "FLAC", "9") |> ignore
+    table.AddRow("Pink Floyd", "The Wall", "1979", "FLAC", "26") |> ignore
+    table.AddRow("Led Zeppelin", "IV", "1971", "MP3", "8") |> ignore
+    table.AddRow("Ange de Poitrine", "Métamorphose", "2024", "FLAC", "12") |> ignore
+    
+    AnsiConsole.Write(table)
+    
+    AnsiConsole.MarkupLine("\n[yellow]⚠️  Library not yet implemented.[/]")
+    AnsiConsole.MarkupLine("[dim]See TODO.md for implementation status.[/]")
     
     0  // Exit code
