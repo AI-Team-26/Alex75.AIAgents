@@ -9,6 +9,7 @@
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="icon.svg" Pack="true" PackagePath="\" />
+    <Compile Include="Providers.fs" />
     <Compile Include="Agents.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>

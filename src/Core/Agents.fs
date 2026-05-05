@@ -4,50 +4,28 @@ open System
 open System.Threading.Tasks
 open Microsoft.Agents.AI
 open Microsoft.Extensions.AI
-open OllamaSharp
 
 // ============================================================================
 // LLM Service Configuration
 // ============================================================================
 
-type LLMProvider =
-    | AliBaba
-    | AliBabaPlan
-    | DeepSeek
-    | GitHub
-    | Mistral
-    | Openrouter
-    | Xiaomi
-    | Google
+/// Configuration for local Ollama instance
+type LocalOllamaConfig = { URL: string }
 
-type LocalOllama = { URL: string }
-type OpenAICompatibleData = { URL: string; ApiKey: string }
-type OpenAICompatibleKnownProvider = { KnownProvider: LLMProvider; ApiKey: string }
+/// Configuration for OpenAI-compatible custom endpoints (URL + API key)
+type OpenAICompatibleConfig = { URL: string; ApiKey: string }
 
+/// Union type representing all supported LLM service types
 type LLMService =
-    | LocalOllama of LocalOllama
-    | OpenAICompatible of OpenAICompatibleData
-    | KnownProvider of OpenAICompatibleKnownProvider
-
-// ============================================================================
-// Constants - Known Provider URLs
-// ============================================================================
-
-module internal Constants =
-    module LLMProviders =
-        let ALIBABA_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
-        let ALIBABA_PLAN_URL = "https://coding-intl.dashscope.aliyuncs.com/v1"
-        let DEEPSEEK_URL = "https://api.deepseek.com"
-        let GITHUB_URL = "https://models.github.ai/inference"
-        let MISTRAL_URL = "https://api.mistral.ai/v1"
-        let OPENROUTER_URL = "https://openrouter.ai/api/v1"
-        let XIAOMI_URL = "https://api.xiaomimimo.com/v1"
-        let GOOGLE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
+    | LocalOllama of LocalOllamaConfig
+    | OpenAICompatible of OpenAICompatibleConfig
+    | KnownProvider of KnownProviderConfig
 
 // ============================================================================
 // Agent Definition
 // ============================================================================
 
+/// Definition for creating an AI agent
 type AgentDefinition = {
     Name: string
     Description: string
@@ -58,6 +36,7 @@ type AgentDefinition = {
 // Agent Factory
 // ============================================================================
 
+/// Factory for creating AI agents with different LLM backends
 type AgentFactory(llmService: LLMService, model: string) =
 
     // TODO: Refactor to reduce duplication between OpenAICompatible and KnownProvider branches
@@ -93,21 +72,11 @@ type AgentFactory(llmService: LLMService, model: string) =
             create(definition, chatClient)
 
         | KnownProvider knownProvider ->
-            let url =
-                match knownProvider.KnownProvider with
-                | LLMProvider.AliBaba -> Constants.LLMProviders.ALIBABA_URL
-                | LLMProvider.AliBabaPlan -> Constants.LLMProviders.ALIBABA_PLAN_URL
-                | LLMProvider.DeepSeek -> Constants.LLMProviders.DEEPSEEK_URL
-                | LLMProvider.GitHub -> Constants.LLMProviders.GITHUB_URL
-                | LLMProvider.Mistral -> Constants.LLMProviders.MISTRAL_URL
-                | LLMProvider.Openrouter -> Constants.LLMProviders.OPENROUTER_URL
-                | LLMProvider.Xiaomi -> Constants.LLMProviders.XIAOMI_URL
-                | LLMProvider.Google -> Constants.LLMProviders.GOOGLE_URL
-
+            let url = LlmProviders.getEndpoint knownProvider.Provider
             let chatClient = createOpenAiCompatibleClient url knownProvider.ApiKey
             create(definition, chatClient)
 
-    member this.CreateOrchestrator(definition: AgentDefinition) : Task<AIAgent> = 
+    member this.CreateOrchestrator(definition: AgentDefinition) : Task<AIAgent> =
         task {
             let agent = createAgent definition
             return agent
