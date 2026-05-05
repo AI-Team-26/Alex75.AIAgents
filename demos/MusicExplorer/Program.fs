@@ -40,7 +40,7 @@ let main argv =
     table.AddRow("Pink Floyd", "The Dark Side of the Moon", "1973", "FLAC", "9") |> ignore
     table.AddRow("Pink Floyd", "The Wall", "1979", "FLAC", "26") |> ignore
     table.AddRow("Led Zeppelin", "IV", "1971", "MP3", "8") |> ignore
-    table.AddRow("Ange de Poitrine", "Métamorphose", "2024", "FLAC", "12") |> ignore
+    table.AddRow("Angine de Poitrine", "Métamorphose", "2024", "FLAC", "12") |> ignore
     
     AnsiConsole.Write(table)
     
