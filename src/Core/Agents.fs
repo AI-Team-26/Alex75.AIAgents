@@ -3,6 +3,7 @@
 open System
 open System.Threading.Tasks
 open Microsoft.Agents.AI
+open Microsoft.Extensions.AI
 open Microsoft.Agents.AI.OpenAI
 open OllamaSharp
 
@@ -60,19 +61,21 @@ type AgentDefinition = {
 
 type AgentFactory(llmService: LLMService, model: string) =
 
-    let createChatClient () =
+    let createAgent (definition: AgentDefinition) =
         match llmService with 
         | LocalOllama ollama -> 
             let config = OllamaApiClient.Configuration()
             config.Uri <- Uri ollama.URL
             config.Model <- model
-            new OllamaApiClient(config) :> _
+            let client = new OllamaApiClient(config)
+            client.AsAIAgent(definition.Instructions, definition.Name, definition.Description)
 
         | OpenAICompatible openai ->
             let credentials = ClientModel.ApiKeyCredential openai.ApiKey
             let options = OpenAIClientOptions()
             options.Endpoint <- Uri openai.URL
-            OpenAIChatClient(model, credentials, options) :> _
+            OpenAIChatClient(model, credentials, options)
+                .AsAIAgent(definition.Instructions, definition.Name, definition.Description)
             
         | KnownProvider knownProvider ->
             let url = 
@@ -89,11 +92,11 @@ type AgentFactory(llmService: LLMService, model: string) =
             let credentials = ClientModel.ApiKeyCredential knownProvider.ApiKey
             let options = OpenAIClientOptions()
             options.Endpoint <- Uri url
-            OpenAIChatClient(model, credentials, options) :> _
+            OpenAIChatClient(model, credentials, options)
+                .AsAIAgent(definition.Instructions, definition.Name, definition.Description)
 
     member this.CreateOrchestrator(definition: AgentDefinition) : Task<AIAgent> = task {
-        let chatClient = createChatClient()
-        let agent = chatClient.AsAIAgent(definition.Instructions, definition.Name, definition.Description)
+        let agent = createAgent definition
         let! session = agent.CreateSessionAsync()
         return session.Agent
     }
