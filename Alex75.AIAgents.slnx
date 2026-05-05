@@ -12,6 +12,6 @@
     <Project Path="src/Core/Core.fsproj" />
   </Folder>
   <Folder Name="/demos/">
-    <Project Path="demos/MusicExplorer/MusicExplorer.fsproj" />
+    <Project Path="demos/MusicLibrary/MusicLibrary.fsproj" />
   </Folder>
 </Solution>
