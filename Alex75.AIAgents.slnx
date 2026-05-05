@@ -2,8 +2,8 @@
   <Folder Name="/Solution Items/">
     <File Path=".github/workflows/deploy.yaml" />
     <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
-    <File Path="src/Directory.Build.props" />
     <File Path="src/README.md" />
     <File Path="src/TODO.md" />
   </Folder>
