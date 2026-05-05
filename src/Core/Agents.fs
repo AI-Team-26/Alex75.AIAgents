@@ -60,7 +60,12 @@ type AgentDefinition = {
 
 type AgentFactory(llmService: LLMService, model: string) =
 
-    let create (settings: AgentDefinition, chatClient: IChatClient) : AIAgent = 
+    // TODO: Refactor to reduce duplication between OpenAICompatible and KnownProvider branches
+    // Both branches create chat clients the same way, only URL resolution differs.
+    // Consider: extract helper function or use polymorphism.
+    // Tracking: This is intentional for now as we're still moving pieces around.
+
+    let create (settings: AgentDefinition, chatClient: IChatClient) : AIAgent =
         let chatClientBuilder = chatClient.AsBuilder()
         let chatClient = chatClientBuilder.Build()
 
@@ -70,25 +75,25 @@ type AgentFactory(llmService: LLMService, model: string) =
 
         agentBuilder.Build()
 
+    let createOpenAiCompatibleClient (url: string) (apiKey: string) =
+        let credentials = ClientModel.ApiKeyCredential apiKey
+        let options = OpenAI.OpenAIClientOptions()
+        options.Endpoint <- Uri url
+        OpenAI.Chat.ChatClient(model, credentials, options).AsIChatClient()
+
     let createAgent (definition: AgentDefinition) =
-        match llmService with 
-        | LocalOllama ollama -> 
+        match llmService with
+        | LocalOllama ollama ->
             // Ollama provides OpenAI-compatible API at /v1 endpoint
-            let credentials = ClientModel.ApiKeyCredential "ollama"
-            let options = OpenAI.OpenAIClientOptions()
-            options.Endpoint <- Uri ollama.URL
-            let chatClient = OpenAI.Chat.ChatClient(model, credentials, options).AsIChatClient()
+            let chatClient = createOpenAiCompatibleClient ollama.URL "ollama"
             create(definition, chatClient)
 
         | OpenAICompatible openai ->
-            let credentials = ClientModel.ApiKeyCredential openai.ApiKey
-            let options = OpenAI.OpenAIClientOptions()
-            options.Endpoint <- Uri openai.URL
-            let chatClient = OpenAI.Chat.ChatClient(model, credentials, options).AsIChatClient()
+            let chatClient = createOpenAiCompatibleClient openai.URL openai.ApiKey
             create(definition, chatClient)
-            
+
         | KnownProvider knownProvider ->
-            let url = 
+            let url =
                 match knownProvider.KnownProvider with
                 | LLMProvider.AliBaba -> Constants.LLMProviders.ALIBABA_URL
                 | LLMProvider.AliBabaPlan -> Constants.LLMProviders.ALIBABA_PLAN_URL
@@ -99,10 +104,7 @@ type AgentFactory(llmService: LLMService, model: string) =
                 | LLMProvider.Xiaomi -> Constants.LLMProviders.XIAOMI_URL
                 | LLMProvider.Google -> Constants.LLMProviders.GOOGLE_URL
 
-            let credentials = ClientModel.ApiKeyCredential knownProvider.ApiKey
-            let options = OpenAI.OpenAIClientOptions()
-            options.Endpoint <- Uri url
-            let chatClient = OpenAI.Chat.ChatClient(model, credentials, options).AsIChatClient()
+            let chatClient = createOpenAiCompatibleClient url knownProvider.ApiKey
             create(definition, chatClient)
 
     member this.CreateOrchestrator(definition: AgentDefinition) : Task<AIAgent> = 
