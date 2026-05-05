@@ -28,26 +28,24 @@ let listSongs (directory: string) = task {
     AnsiConsole.MarkupLine $"[cyan]{answer}[/]"
 }
 
-
-// Display header
-AnsiConsole.MarkupLine("[bold cyan]MusicLibrary Demo[/]")
-AnsiConsole.MarkupLine("[dim]====================[/]\n")
-
-// Main menu selector
-let choices = [
+/// Main menu choices
+let menuChoices = [
     "Show me what songs are in a directory"
     "Create a catalogue of songs in a directory"
     "Convert FLAC files to MP3"
+    "Exit"
 ]
 
-let selection = AnsiConsole.Prompt(
-    SelectionPrompt<string>()
-        .Title("[bold]What would you like to do?[/]")
-        .AddChoices(choices)
-)
-    
-(task {
+/// Display main menu and get user selection
+let showMenu () =
+    AnsiConsole.Prompt(
+        SelectionPrompt<string>()
+            .Title("[bold]What would you like to do?[/]")
+            .AddChoices(menuChoices)
+    )
 
+/// Handle user selection
+let handleSelection selection = task {
     try
         match selection with
         | "Show me what songs are in a directory" ->
@@ -55,7 +53,7 @@ let selection = AnsiConsole.Prompt(
                 TextPrompt<string>("[bold]Enter directory path:[/]")
                     .DefaultValue("d:/music")
             )
-            listSongs path |> ignore
+            do! listSongs path
 
         | "Create a catalogue of songs in a directory" ->
             AnsiConsole.MarkupLine("[yellow]Catalogue (not yet implemented)[/]")
@@ -63,11 +61,37 @@ let selection = AnsiConsole.Prompt(
         | "Convert FLAC files to MP3" ->
             AnsiConsole.MarkupLine("[yellow]Convert FLAC to MP3 (not yet implemented)[/]")
 
+        | "Exit" ->
+            AnsiConsole.MarkupLine("[green]Goodbye![/]")
+
         | _ ->
             AnsiConsole.MarkupLine("[red]Unknown option[/]")
     with ex ->
        AnsiConsole.MarkupLine $"[red]Failed to call Agent.[/]"
        AnsiConsole.WriteException(ex)
 
-})//.Spinner(Spinner.Known.Aesthetic)
-|> Async.AwaitTask |> Async.RunSynchronously
+    AnsiConsole.MarkupLine ""
+}
+
+// ============================================================================
+// Main Entry Point
+// ============================================================================
+
+[<EntryPoint>]
+let main argv =
+    // Display header
+    AnsiConsole.MarkupLine("[bold cyan]MusicLibrary Demo[/]")
+    AnsiConsole.MarkupLine("[dim]====================[/]\n")
+
+    // Main loop - keep showing menu until user exits
+    let rec mainLoop () = task {
+        let selection = showMenu ()
+        do! handleSelection selection
+
+        if selection <> "Exit" then
+            return! mainLoop ()
+    }
+
+    mainLoop () |> Async.AwaitTask |> Async.RunSynchronously
+
+    0  // Exit code
