@@ -4,7 +4,7 @@ A .NET F# library for creating AI agents with tools - simple functions over fram
 
 **Architecture:** Orchestrator + Context Provider pattern
 - **Orchestrator:** Central supervisor that manages all agent communication
-- **Context Provider:** Shared memory (Redis or in-memory) for passing data between agents
+- **Context Provider:** Shared memory (in-memory or Redis) for passing data between agents
 - **Agents:** Stateless workers that read/write to context, don't know about each other
 
 ---
@@ -17,47 +17,72 @@ A .NET F# library for creating AI agents with tools - simple functions over fram
 
 ## Backlog
 
-### Core Types & Interfaces
-- [ ] Define `IContextProvider` interface (Get, Set, Delete, Keys)
-- [ ] Implement `InMemoryContextProvider` (for simple apps)
-- [ ] Implement `RedisContextProvider` (for distributed/scalable apps)
-- [ ] Define `IAgent` interface (Ask, Tools, Context)
+### Phase 1: Core Foundation (Mock-Only Demo)
+
+#### Core Types & Interfaces
 - [ ] Define `ITool` interface (Name, Description, Execute)
+- [ ] Define `IAgent` interface (Name, Tools, Ask)
+- [ ] Define `IContextProvider` interface (Get, Set, TryGetValue, Remove, Keys)
+- [ ] Define `IAgentOrchestrator` interface (Agents, Context, Execute)
 
-### Core API (Tier 1 - Simple Helpers)
+#### Core Implementations (Mock)
+- [ ] Implement `InMemoryContextProvider` (thread-safe, ConcurrentDictionary)
+- [ ] Implement `ToolBuilder` module (create, createAsync)
+- [ ] Implement `MockAgent` (pre-programmed responses for testing)
+- [ ] Implement `AgentOrchestrator` (basic coordination)
+
+#### Built-in Agents (Mock)
+- [ ] Create `fileExplorerAgent` tools:
+  - `scanFiles` - scan directory for files matching pattern
+  - `readFile` - read file content
+  - `listDirectories` - list subdirectories
+  - `getFileMetadata` - get file size, dates, extension
+- [ ] Create `fileEditorAgent` tools:
+  - `writeFile` - write content to file
+  - `createDirectory` - create new directory
+  - `fileOperation` - copy, move, delete files
+
+#### MusicLibrary Demo (Mock-Only)
+- [ ] Rename `demos/MusicExplorer` → `demos/MusicLibrary`
+- [ ] Update demo to use agents and orchestrator
+- [ ] Implement **Demo 1**: "What MP3 files are in `<path>`"
+  - Simple text output listing files
+- [ ] Implement **Demo 2**: "Catalogue music in `<path>` to `<output.txt>`"
+  - Artist/Album/Song format
+  - Plain text output file
+
+---
+
+### Phase 2: Real LLM Integration (Future)
+
+#### LLM Configuration
 - [ ] Define `LlmConfig` type (provider, model, API key, endpoint)
-- [ ] Implement `Agents.createAgent` - basic agent from LLM config + context
-- [ ] Implement `Agents.createAgentWithTools` - agent with custom tools + context
-- [ ] Implement `Tools.create` - create tool from function
-- [ ] Implement `Tools.createFromFunctions` - batch create tools from module
+- [ ] Implement `LlmAgent` (real LLM-backed agent)
+- [ ] Integrate with Microsoft.Agents.AI or similar
 
-### Ready-to-Use Agents (Tier 2)
-- [ ] Implement `Agents.fileExplorerAgent` - **READ-ONLY**: browse directories, list files, read contents
-  - Writes to context: `"{agentName}.output"` = file list
-- [ ] Implement `Agents.fileEditorAgent` - **READ-WRITE**: create, delete, move, copy, modify files
-  - Reads from context: `"{agentName}.input"` = files to process
-- [ ] Implement `Agents.webSearchAgent` - search the web (requires API key)
+#### Enhanced Orchestrator
+- [ ] LLM-based request routing
+- [ ] Workflow planning (break request into agent steps)
+- [ ] Context key conventions (`"{agent}.input"`, `"{agent}.output"`)
 
-### Orchestrator
-- [ ] Implement `AgentOrchestrator` class
-  - `AddAgent(agent)` - register agent with orchestrator
-  - `Ask(question)` - LLM-based routing and workflow execution
-  - Internal: Manages context keys for agent communication
-- [ ] Implement workflow planning (LLM breaks request into agent steps)
-- [ ] Implement context key conventions (`"{agent}.input"`, `"{agent}.output"`)
+#### Additional Agents (Future)
+- [ ] `webSearchAgent` - search the web (requires API key)
+- [ ] `codeExplorerAgent` - analyze codebases
+- [ ] `dataAnalyzerAgent` - process structured data
 
-### Example Tools
-- [ ] FLAC → MP3 conversion tool (example custom tool)
+---
+
+### Phase 3: Advanced Features (Future)
+
+#### Tools & Extensions
+- [ ] FLAC → MP3 conversion tool (requires FFmpeg)
 - [ ] Audio metadata extractor (ID3 tags, FLAC metadata)
-- [ ] Directory scanner for media files (with pagination/summary)
+- [ ] Directory scanner with pagination/summary
 
-### Music Library Analyzer (Example App)
-- [ ] Create demo console app: `demos/MusicExplorer`
-- [ ] Implement orchestrator workflow for music analysis
-- [ ] Demo: "Analyze /home/music and show my collection"
-- [ ] Demo: "Convert all FLAC to MP3 in /home/music"
+#### Context Providers
+- [ ] `RedisContextProvider` (for distributed/scalable apps)
 
-### Infrastructure
+#### Infrastructure
 - [ ] Add XML documentation to public API
 - [ ] Add usage examples to `/src/Core/README.md`
 - [ ] Set up unit test project
@@ -67,7 +92,10 @@ A .NET F# library for creating AI agents with tools - simple functions over fram
 
 ## Done
 
-*(nothing yet)*
+- [x] Project structure created (F# library)
+- [x] Solution file (.slnx format)
+- [x] CI/CD workflow (GitHub Actions)
+- [x] NuGet package configuration (icon, README)
 
 ---
 
